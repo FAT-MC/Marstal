@@ -5,7 +5,8 @@ import {
   Route
 } from "react-router-dom";
 import {
-  HomePage
+  HomePage,
+  VoiceChatPage
 } from "./components";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />}/>
+        <Route path="/voice" element={<VoiceChatPage />} />
       </Routes>
       {/* <Route
         path="/protected"
