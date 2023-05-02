@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { playAudioBuffer } from "../../../utils";
-import { receiveMessage, sendMessage } from "../../../service/socketService";
+import { SocketContext } from "../../../context";
 
 export function VoiceChatPage() {
+  const { sendMessage, audioResponse } = useContext(SocketContext);
+
   const {
     transcript,
     finalTranscript,
@@ -13,21 +15,19 @@ export function VoiceChatPage() {
   } = useSpeechRecognition();
 
   useEffect(() => {
-    receiveMessage((aiAudioResponse) => {
-      const binaryAudioBuffer = aiAudioResponse.audioData;
+    if (audioResponse) {
+      const binaryAudioBuffer = audioResponse.audioData;
 
       playAudioBuffer(binaryAudioBuffer)
         .finally(() => {
           resetTranscript();
           SpeechRecognition.startListening();
         })
-    })
-  }, [])
+    }
+  }, [audioResponse])
 
   useEffect(() => {
     if (finalTranscript && finalTranscript.length > 0) {
-      //
-      console.log(`Sending message to AI: ${finalTranscript}`)
       sendMessage(finalTranscript);
     }
   }, [finalTranscript])

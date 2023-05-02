@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 // import { sendMessage } from "../../../api";
 import { playAudioBuffer } from "../../../utils";
-import { receiveMessage, sendMessage } from "../../../service/socketService";
+import { SocketContext } from "../../../context"
 import "./HomePage.css";
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { sendMessage, audioResponse } = useContext(SocketContext);
   const [inputText, setInputText] = useState("");
 
   useEffect(() => {
-    receiveMessage((aiAudioResponse) => {
-      const binaryAudioBuffer = aiAudioResponse.audioData;
+    if (audioResponse) {
+      const binaryAudioBuffer = audioResponse.audioData;
       playAudioBuffer(binaryAudioBuffer)
         .finally(() => {
           setInputText("")
         })
-    })
-  }, [])
+    }
+  }, [audioResponse])
 
   const onTextChange = (e) => {
     setInputText(e.target.value)

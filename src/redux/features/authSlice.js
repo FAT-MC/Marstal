@@ -1,27 +1,57 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { loginWithToken } from "../../api";
+import { storeToken, retrieveToken } from "../../utils/storageManager";
 
 const initialState = {
-  isLoggedIn: false,
+  isLoading: false,
+  isAuthenticated: retrieveToken() && retrieveToken().length > 0,
   error: null
 }
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducer: {
-    authChecked: (state, action) => {
-      // check auth here 
-
-      // update auth status
-      state.isLoggedIn = true
+  reducers: {
+    startLogin(state, action) {
+      state.isLoading = true;
     },
+    succeedLogin(state, action) {
+      state.isLoading = false;
+      state.isAuthenticated = true;
+      state.error = null;
+    },
+    failedLogin(state, action) {
+      state.isLoading = false;
+      state.isAuthenticated = null;
+      state.error = action.payload
+    },
+    updateLoginStatus(state, action) {
+      state.isAuthenticated = action.payload ? true : false
+    }
   },
 })
 
-export { authSlice }
-
+const { actions, reducer } = authSlice;
 
 // Action creators are generated for each case reducer function
-export const { authChecked } = authSlice.actions
+const {
+  startLogin,
+  succeedLogin,
+  failedLogin,
+  updateLoginStatus
+} = actions;
 
-export default authSlice.reducer
+const login = (token) => async (dispatch, state) => {
+  dispatch(startLogin())
+
+  try {
+    const authResponse = await loginWithToken(token);
+    storeToken(authResponse.auth_token);
+    dispatch(succeedLogin());
+  } catch (error) {
+    dispatch(failedLogin(error))
+  }
+}
+
+export { login }
+export default reducer
