@@ -1,5 +1,6 @@
 import React, { useEffect, useState, createContext } from 'react';
 import io from 'socket.io-client';
+import { retrieveToken } from "../utils/storageManager"
 
 const SocketContext = createContext();
 
@@ -8,7 +9,7 @@ function SocketProvider({ children }) {
   const [audioResponse, setAudioResponse] = useState(null);
 
   useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_SERVER_URL);
+    const newSocket = io(process.env.REACT_APP_SERVER_URL, { auth: { token: retrieveToken() } });
     setSocket(newSocket);
 
     return () => {
@@ -27,6 +28,10 @@ function SocketProvider({ children }) {
 
     socket.on('disconnect', () => {
       console.log(`Socket ${socket.id} Disconnected from server`);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error(err);
     });
 
     socket.on('response', (aiAudioResponse) => {

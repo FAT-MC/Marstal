@@ -33,7 +33,6 @@ export function AuthPage() {
           account: accounts[0],
         })
         .then((response) => {
-          console.log(response)
           dispatch(login(response.accessToken))
         });
     }
@@ -47,7 +46,6 @@ export function AuthPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("authenticated");
       redirectUser()
     }
   }, [isAuthenticated, naviate])
