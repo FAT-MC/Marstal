@@ -1,39 +1,56 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  Navigate
 } from "react-router-dom";
 import {
   HomePage,
-  VoiceChatPage
+  VoiceChatPage,
+  AuthPage,
+  Page
 } from "./components";
+import { SocketProvider } from "./context";
+
 
 function App() {
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
+
+  function RequireAuth({ children, redirectTo }) {
+    return isAuthenticated ? children : <Navigate to="/auth" replace state={{ redirectTo }} />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />}/>
-        <Route path="/voice" element={<VoiceChatPage />} />
-      </Routes>
-      {/* <Route
-        path="/protected"
-        element={
-          // Good! Do your composition here instead of wrapping <Route>.
-          // This is really just inverting the wrapping, but it's a lot
-          // more clear which components expect which props.
-          <RequireAuth redirectTo="/login">
-            <ProtectedPage />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/voice" element={
+          <RequireAuth redirectTo="/voice">
+            <Page>
+              <SocketProvider>
+                <VoiceChatPage />
+              </SocketProvider>
+            </Page>
           </RequireAuth>
-        }
-      /> */}
+        } />
+        <Route
+          path="/home"
+          element={
+            <RequireAuth redirectTo="/home">
+              <Page>
+                <SocketProvider>
+                  <HomePage />
+                </SocketProvider>
+              </Page>
+            </RequireAuth>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
-
-// function RequireAuth({ children, redirectTo }) {
-//   let isAuthenticated = getAuth();
-//   return isAuthenticated ? children : <Navigate to={redirectTo} />;
-// }
 
 export default App;
