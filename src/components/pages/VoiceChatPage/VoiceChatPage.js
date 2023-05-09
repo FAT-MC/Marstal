@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { playAudioBuffer } from "../../../utils";
+import { playAudioBuffer } from "../../../utils/audioHelper";
 import { SocketContext } from "../../../context";
 
 export function VoiceChatPage() {

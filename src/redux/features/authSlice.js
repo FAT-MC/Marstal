@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginWithToken } from "../../api";
-import { storeToken, retrieveToken } from "../../utils/storageManager";
+import {
+  getAccessToken,
+  requestNewTokens
+} from "../../service/tokenService";
 
 const initialState = {
   isLoading: false,
-  isAuthenticated: retrieveToken() && retrieveToken().length > 0,
+  isAuthenticated: getAccessToken() && getAccessToken().length > 0,
   error: null
 }
 
@@ -24,9 +26,6 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.isAuthenticated = null;
       state.error = action.payload
-    },
-    updateLoginStatus(state, action) {
-      state.isAuthenticated = action.payload ? true : false
     }
   },
 })
@@ -37,16 +36,14 @@ const { actions, reducer } = authSlice;
 const {
   startLogin,
   succeedLogin,
-  failedLogin,
-  updateLoginStatus
+  failedLogin
 } = actions;
 
-const login = (token) => async (dispatch, state) => {
+const login = (oAuthToken) => async (dispatch, state) => {
   dispatch(startLogin())
 
   try {
-    const authResponse = await loginWithToken(token);
-    storeToken(authResponse.auth_token);
+    await requestNewTokens(oAuthToken)
     dispatch(succeedLogin());
   } catch (error) {
     dispatch(failedLogin(error))
