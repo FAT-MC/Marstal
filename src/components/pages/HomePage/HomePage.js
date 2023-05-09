@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 // import { sendMessage } from "../../../api";
-import { playAudioBuffer } from "../../../utils";
+import { playAudioBuffer } from "../../../utils/audioHelper";
 import { SocketContext } from "../../../context"
 import "./HomePage.css";
 
