@@ -1,13 +1,18 @@
-const storeToken = (token) => {
-  if (!token) {
-    throw new Error("Error saving invalid token");
+const storeTokens = (tokenPayload) => {
+  if (!tokenPayload || !tokenPayload.accessToken || !tokenPayload.refreshToken) {
+    throw new Error("Error saving invalid tokens");
   }
 
-  localStorage.setItem("auth_token", token);
+  localStorage.setItem("tokens", JSON.stringify(tokenPayload));
 }
 
-const retrieveToken = () => {
-  return localStorage.getItem("auth_token");
+const retrieveTokens = () => {
+  const storedTokens = localStorage.getItem("tokens");
+  return storedTokens && JSON.parse(storedTokens);
 }
 
-export { storeToken, retrieveToken }
+const resetStorage = () => {
+  return localStorage.clear();
+}
+
+export { storeTokens, retrieveTokens, resetStorage }
