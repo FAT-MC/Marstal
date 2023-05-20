@@ -6,7 +6,7 @@ const SocketContext = createContext();
 
 function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
-  const [audioResponse, setAudioResponse] = useState(null);
+  const [messageResponse, setMessageResponse] = useState(null);
 
   useEffect(() => {
     const newSocket = io(process.env.REACT_APP_SERVER_URL, { auth: { token: getAccessToken() } });
@@ -43,17 +43,17 @@ function SocketProvider({ children }) {
       }
     });
 
-    socket.on('response', (aiAudioResponse) => {
-      setAudioResponse(aiAudioResponse);
+    socket.on('response', (responsePayload) => {
+      setMessageResponse(responsePayload);
     });
   }
 
-  const sendMessage = (message) => {
-    socket && socket.emit('chat', message);
+  const sendMessage = (messagePayload, errorHandler) => {
+    socket && socket.emit('chat', messagePayload, errorHandler);
   }
 
   return (
-    <SocketContext.Provider value={{ sendMessage, audioResponse }}>
+    <SocketContext.Provider value={{ sendMessage, messageResponse }}>
       {children}
     </SocketContext.Provider>
   )

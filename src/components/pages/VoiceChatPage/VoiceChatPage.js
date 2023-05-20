@@ -16,7 +16,7 @@ export function VoiceChatPage() {
 
   useEffect(() => {
     if (audioResponse) {
-      const binaryAudioBuffer = audioResponse.audioData;
+      const binaryAudioBuffer = audioResponse.audio;
 
       playAudioBuffer(binaryAudioBuffer)
         .finally(() => {
