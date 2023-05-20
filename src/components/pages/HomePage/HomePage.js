@@ -9,7 +9,6 @@ import {
   setCurrentChat,
   addChat,
   fetchCurrentMessages,
-  startWaitForResponse,
   receivedResponse,
   failedToReceiveResponse
 } from "../../../redux/features/chatSlice";
@@ -127,9 +126,17 @@ export function HomePage() {
     dispatch(setCurrentChat(chat))
   }
 
+  const onAddNewChat = () => {
+    dispatch(addChat())
+  }
+
   const getConversationList = () => {
     return chats.map((chat, index) => (
-      <Conversation name={chat.topic} key={index} onClick={() => onSelectChat(chat)}>
+      <Conversation
+        name={chat.topic}
+        key={index}
+        onClick={() => onSelectChat(chat)}
+        active={currentChat && currentChat.id === chat.id}>
         <Avatar src={profileImage} />
       </Conversation>))
   }
@@ -168,6 +175,7 @@ export function HomePage() {
     return (
       <ChatContainer>
         <MessageList
+          loading={isFetchingMessages}
           typingIndicator={isWaitingForReply ? (<TypingIndicator content="Assistant is typing" />) : null}
         >
           {messageList}
@@ -186,18 +194,11 @@ export function HomePage() {
   return (
     <div className="p-HomePage__container">
       <MainContainer responsive>
-        <Sidebar position="left" scrollable={true} style={isFetchingChats ? {
-          "alignItems": "center",
-          "justifyContent": "center"
-        } : null}>
-          {isFetchingChats ? <Loader /> : (
-            <> <Button border>New Chat</Button>
-              <ConversationList>
-                {getConversationList()}
-              </ConversationList>
-            </>
-          )}
-
+        <Sidebar position="left" scrollable={true}>
+          <Button border onClick={onAddNewChat}>New Chat</Button>
+          <ConversationList loading={isFetchingChats || isAddingChats}>
+            {getConversationList()}
+          </ConversationList>
         </Sidebar>
 
         {currentChat ? getMessageContent() : <ChatContainer></ ChatContainer>}
